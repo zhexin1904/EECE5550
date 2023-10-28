@@ -168,22 +168,20 @@ std::vector<particle> pf_propagation(double t1, double t2, differentialRobotSE2 
         while (counter < T)
         {
         
+            V_w = T_wb_2.so2() * V_b;
+            P_w =  T_wb_2.translation() + V_w * dt;
+            // update in translation
+            T_wb_2.translation() = P_w;
+            // update in SO2
 
 
-        V_w = T_wb_2.so2() * V_b;
-        P_w =  T_wb_2.translation() + V_w * dt;
-        // update in translation
-        T_wb_2.translation() = P_w;
-        // update in SO2
+            T_wb_2.so2() = T_wb_2.so2() * Sophus::SO2d::exp(angle * dt);
+            counter = counter + dt;
 
+            }
 
-        T_wb_2.so2() = T_wb_2.so2() * Sophus::SO2d::exp(angle * dt);
-        counter = counter + dt;
-
-        }
-
-        prediction_data << T_wb_2.translation().x() << "," << T_wb_2.translation().y() << std::endl;
-        particles_t1[i].pose = T_wb_2;
+            prediction_data << T_wb_2.translation().x() << "," << T_wb_2.translation().y() << std::endl;
+            particles_t1[i].pose = T_wb_2;
 
 
 
@@ -199,7 +197,7 @@ std::vector<particle> pf_propagation(double t1, double t2, differentialRobotSE2 
 
 
 
-
+// different methods of resampling
 std::vector<particle> resampling_1(std::vector<particle> particles_, std::vector<double> weights)
 {
     std::vector<particle> updateParticles(particles_.size());
@@ -218,6 +216,7 @@ std::vector<particle> resampling_1(std::vector<particle> particles_, std::vector
     return updateParticles;
 }
 
+// different methods of resampling
 std::vector<particle>  resampling_2(std::vector<particle> particles_, std::vector<double> weights)
 {
 std::vector<particle> resampledParticles;
@@ -252,6 +251,7 @@ for (const particle& particle : particles_)
     return resampledParticles;
 }
 
+// different methods of resampling
 std::vector<particle> resample_3(const std::vector<particle>& particles) {
     std::vector<particle> resampled_particles;
     std::vector<double> cumulative_weights;
@@ -303,23 +303,15 @@ std::vector<particle> pf_updata(std::vector<particle> particles, measurement GPS
         totalWeight = weight + totalWeight;
     }
     weights_normalize.resize(weights.size());
-    // for (auto it : weights)
-    // {
-    //     it = it / totalWeight;
-
-    // }
 
     for (size_t i = 0; i < weights.size(); i++)
     {
         weights_normalize[i] = weights[i] / totalWeight;
         particles[i].weight = weights_normalize[i];
     }
-    
-    
-    
+        
     updateParticles = resample_3(particles);
-    // updateParticles = resampling_2(particles, weights);
-    // updateParticles = resampling_1(particles, weights_normalize);
+
     for (auto it : updateParticles)
     {
         updated_data << it.pose.translation().x() << "," << it.pose.translation().y() << std::endl;

@@ -89,6 +89,7 @@ struct particle
     double weight;
 };
 
+// init pf
 std::vector<particle> pf_init(int num, int x_, int y_, int angle_, std::vector<particle> partciles, std::ofstream &prediction_data)
 {
 
@@ -121,6 +122,7 @@ std::vector<particle> pf_init(int num, int x_, int y_, int angle_, std::vector<p
         
 }
 
+// generate zero Guassian noise according to the sigma
 std::vector<double> genNoise(double sigma)
 {
     std::random_device rd;
@@ -138,7 +140,7 @@ std::vector<double> genNoise(double sigma)
     return gaussian_samples;
 }
 
-
+// pf propogation, using motion model
 std::vector<particle> pf_propagation(double t1, double t2, differentialRobotSE2 Car, std::vector<particle> particles_t1, std::ofstream &prediction_data)
 {
 
@@ -228,23 +230,21 @@ for (const particle& particle : particles_)
     cumulativeWeights.push_back(cumulativeWeight);
 
     std::default_random_engine generator;
-std::uniform_real_distribution<double> distribution(0.0, 1.0);
-double startPoint = distribution(generator);
+    std::uniform_real_distribution<double> distribution(0.0, 1.0);
+    double startPoint = distribution(generator);
 
-int index = 0;
-double step = cumulativeWeight / particles_.size();
-double cumulative = startPoint;
+    int index = 0;
+    double step = cumulativeWeight / particles_.size();
+    double cumulative = startPoint;
 
-for (int i = 0; i < particles_.size(); ++i) {
-    while (cumulative > cumulativeWeights[index]) {
-        index++;
+    for (int i = 0; i < particles_.size(); ++i) {
+        while (cumulative > cumulativeWeights[index]) {
+            index++;
+        }
+        resampledParticles.push_back(particles_[index]);
+        cumulative += step;
     }
-    resampledParticles.push_back(particles_[index]);
-    cumulative += step;
-}
 
-// 更新原来的粒子向量
-// particles_ = resampledParticles;
 
 }  
     
@@ -284,7 +284,9 @@ std::vector<particle> resample_3(const std::vector<particle>& particles) {
 
 
 
-
+// pf update
+// 1, calculate weight, using Guassian pdf
+// 2, resampling according to weight
 std::vector<particle> pf_updata(std::vector<particle> particles, measurement GPS, double time, std::ofstream &updated_data)
 {
     std::vector<double> weights;

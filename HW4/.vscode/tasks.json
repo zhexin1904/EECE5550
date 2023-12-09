@@ -1,0 +1,28 @@
+{
+    "options": {
+        "cwd": "${workspaceFolder}/bin/testMain"
+    },
+    "tasks": [
+        {
+            "label": "cmake",
+            "command": "cmake",
+            "args": [
+                "-DCMAKE_BUILD_TYPE=Debug",
+                // "${fileDirname}/src/*.cpp"
+            ]
+        },
+        {
+            "label": "make",
+            "command": "make"
+        },
+        {
+            "label": "CMake Build",
+            "dependsOn": [
+                "cmake",
+                "make"
+            ]
+        }
+    ],
+    "version": "2.0.0"
+}
+

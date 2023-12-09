@@ -1,0 +1,13 @@
+[
+{
+  "directory": "/home/jason/EECE5550/hw/HW2/PF/build",
+  "command": "/usr/bin/g++   -I/usr/include/eigen -I/home/jason/EECE5550/hw/HW2-3 -isystem /usr/include/eigen3   -O0 -Wall -g   -std=gnu++11 -o CMakeFiles/SE2_pf.dir/src/main.cpp.o -c /home/jason/EECE5550/hw/HW2/PF/src/main.cpp",
+  "file": "/home/jason/EECE5550/hw/HW2/PF/src/main.cpp"
+},
+
+{
+  "directory": "/home/jason/EECE5550/hw/HW2/PF/build",
+  "command": "/usr/bin/g++   -I/usr/include/eigen -I/home/jason/EECE5550/hw/HW2-3 -isystem /usr/include/eigen3   -O0 -Wall -g   -std=gnu++11 -o CMakeFiles/SE2_motion.dir/src/robot.cpp.o -c /home/jason/EECE5550/hw/HW2/PF/src/robot.cpp",
+  "file": "/home/jason/EECE5550/hw/HW2/PF/src/robot.cpp"
+}
+]

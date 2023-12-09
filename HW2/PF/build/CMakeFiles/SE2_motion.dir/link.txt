@@ -1,0 +1,1 @@
+/usr/bin/c++   -O0 -Wall -g  -rdynamic CMakeFiles/SE2_motion.dir/src/robot.cpp.o  -o ../bin/SE2_motion 

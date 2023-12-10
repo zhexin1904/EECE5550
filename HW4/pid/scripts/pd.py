@@ -4,25 +4,25 @@ import matplotlib.pyplot as plt
 class PDController:
     def __init__(self, Kp, Kd):
         self.m = 0.065  
-        self.g = 9.81  
-        self.kT = 5.276e-4
         self.ref = 1  
         self.Kp = Kp
         self.Kd = Kd
         self.dt = 0.05
-        self.time = np.arange(0, 100, self.dt)
-        self.h = 0
+        self.g = 9.81  
+        self.kT = 5.276e-4
+        self.altitude = 0
         self.velo = 0
-        self.h_values = []
+        self.time = np.arange(0, 100, self.dt)
+        self.altitude_values = []
         self.velo_values = []
 
     def intergartion(self):
         for _ in self.time:
-            u = self.Kp * (self.ref - self.h) + self.Kd * (-self.velo) + (self.m * self.g) / (4 * self.kT)
-            velo_dot = (4 * self.kT * u - self.m * self.g) / self.m
+            output = self.Kp * (self.ref - self.altitude) + self.Kd * (-self.velo) + (self.m * self.g) / (4 * self.kT)
+            velo_dot = (4 * self.kT * output - self.m * self.g) / self.m
             self.velo += velo_dot * self.dt
-            self.h += self.velo * self.dt
-            self.h_values.append(self.h)
+            self.altitude += self.velo * self.dt
+            self.altitude_values.append(self.altitude)
             self.velo_values.append(self.velo)
 
     def plot(self):

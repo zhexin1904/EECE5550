@@ -5,7 +5,7 @@ import pdb
 
 
 class MDP:
-    def __init__(self, map, test, factor, actionType, plans):
+    def __init__(self, map, actionType, plans, test, factor):
         self.map = map
         self.actionType = actionType
         self.plans = plans
@@ -26,6 +26,19 @@ class MDP:
         return {'test_1': 0.1, 'test_2': 0.4, 'factor': 0.9, 'actionType': ['up', 'down', 'right', 'left'],
                 'plans': {'up': (-1, 0), 'down': (1, 0), 'right': (0, 1), 'left': (0, -1)}}
 
+    def value_(self, state, action, V):
+        future_states = self.futurestates(state, action)
+        value = sum(self.decision(action, spot, state) * V[spot[0], spot[1]] for spot in future_states)
+        return value
+    
+    def futurestates(self, state, action):
+        i, j = state
+        if action in self.plans:
+            i_spot, j_spot = i + self.plans[action][0], j + self.plans[action][1]
+            return [(i_spot, j_spot)] if 0 <= i_spot < self.map.shape[0] and 0 <= j_spot < self.map.shape[1] else [(i, j)]
+        else:
+            return [(i, j)]
+    
     def update(self):
         value = self.initialize_value_function()
         delta_threshold = self.test * (1 - self.factor) / self.factor
@@ -46,19 +59,6 @@ class MDP:
 
         return value
 
-    def futurestates(self, state, action):
-        i, j = state
-        if action in self.plans:
-            i_spot, j_spot = i + self.plans[action][0], j + self.plans[action][1]
-            return [(i_spot, j_spot)] if 0 <= i_spot < self.map.shape[0] and 0 <= j_spot < self.map.shape[1] else [(i, j)]
-        else:
-            return [(i, j)]
-
-    def value_(self, state, action, V):
-        future_states = self.futurestates(state, action)
-        value = sum(self.decision(action, spot, state) * V[spot[0], spot[1]] for spot in future_states)
-        return value
-
     def decision(self, action, state_prime, state):
         i, j = state
         i_spot, j_spot = state_spot
@@ -66,7 +66,7 @@ class MDP:
             return 1 - self.test if (i_spot - i, j_spot - j) == self.plans[action] else self.test / 2
         else:
             return 0 
-
+        
     def best_decision(self, V):
         policy = np.full_like(self.map, -1, dtype=int)
     
@@ -75,7 +75,6 @@ class MDP:
                 if not np.isnan(V[i, j]):
                     max_q_value = float('-inf')
                     best_action = -1
-    
                     for idx, action in enumerate(self.actionType):
                         current_q_value = self.q_value((i, j), action, V)
                         if current_q_value > max_q_value:
@@ -85,26 +84,32 @@ class MDP:
                     policy[i, j] = best_action
     
         return policy
-    
 
-    def visualize(self, policy, title):
+
+    def visualize(self, policy):
         plt.imshow(self.map, cmap='viridis', origin='upper', extent=[0, self.map.shape[1], 0, self.map.shape[0]])
         for i in range(self.map.shape[0]):
             for j in range(self.map.shape[1]):
-                self.visualize_direction(policy[i, j], j + 0.5, self.map.shape[0] - (i + 0.5))
-        plt.title(title)
-        plt.show()
-        plt.savefig('1.png', dpi=300)
+                action = policy[i, j]
+                x, y = j + 0.5, self.map.shape[0] - (i + 0.5)
+                self.visual_arrow(action, x, y)
 
-    def visualize_direction(self, action, x, y):
+        plt.savefig('1.png', dpi=300)
+        plt.show()
+
+    def visual_arrow(self, action, x, y):
+        dx, dy = 0, 0
         if action == 'up':
-            plt.arrow(x, y, 0, 0.3, head_width=0.1, head_length=0.1, fc='red', ec='red')
+            dy = 0.5
         elif action == 'down':
-            plt.arrow(x, y, 0, -0.3, head_width=0.1, head_length=0.1, fc='red', ec='red')
+            dy = -0.5
         elif action == 'right':
-            plt.arrow(x, y, 0.3, 0, head_width=0.1, head_length=0.1, fc='red', ec='red')
+            dx = 0.5
         elif action == 'left':
-            plt.arrow(x, y, -0.3, 0, head_width=0.1, head_length=0.1, fc='red', ec='red')
+            dx = -0.5
+
+        plt.arrow(x, y, dx, dy, head_width=0.15, head_length=0.15, fc='red', ec='red')
+
 
 def main():
     mdp_vi = MDP(None, None, None, None, None)
@@ -113,12 +118,11 @@ def main():
 
     mdp_vi = MDP(map, parameters['test_2'], parameters['factor'], parameters['actionType'], parameters['plans'])
     value = mdp_vi.update()
+    # print(value)
     test_1 = mdp_vi.best_decision(value)
+    # print(test_1)
 
-    print("Final value:\n", value)
-    print("Best :\n", test_1)
-
-    mdp_vi.visualize(test_1, 'ϵ = 0.4')
+    mdp_vi.visualize(test_1)
 
 
 if __name__ == "__main__":

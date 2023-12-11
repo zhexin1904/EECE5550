@@ -66,16 +66,26 @@ class MDP:
             return 1 - self.test if (i_spot - i, j_spot - j) == self.plans[action] else self.test / 2
         else:
             return 0 
-        
+
     def best_decision(self, V):
-        policy = np.empty_like(self.map, dtype='<U5')
+        policy = np.full_like(self.map, -1, dtype=int)
+    
         for i in range(self.map.shape[0]):
             for j in range(self.map.shape[1]):
                 if not np.isnan(V[i, j]):
-                #  pdb.set_trace()
-                    best_action = max(self.actionType, key=lambda a: self.q_value((i, j), a, V))
+                    max_q_value = float('-inf')
+                    best_action = -1
+    
+                    for idx, action in enumerate(self.actionType):
+                        current_q_value = self.q_value((i, j), action, V)
+                        if current_q_value > max_q_value:
+                            max_q_value = current_q_value
+                            best_action = idx
+    
                     policy[i, j] = best_action
+    
         return policy
+    
 
     def visualize(self, policy, title):
         plt.imshow(self.map, cmap='viridis', origin='upper', extent=[0, self.map.shape[1], 0, self.map.shape[0]])

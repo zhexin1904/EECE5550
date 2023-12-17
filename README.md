@@ -13,6 +13,11 @@
 
 # HW3
 ![image](https://github.com/zhexin1904/hw/blob/main/HW3/vslam/pic/plot_new1.png)
+![image](https://github.com/zhexin1904/hw/blob/main/HW3/vslam/pic/plot_new2.png
+)
+
+![image](https://github.com/zhexin1904/hw/blob/main/HW3/vslam/pic/plot_new2.png
+)
 
 
 # HW4
